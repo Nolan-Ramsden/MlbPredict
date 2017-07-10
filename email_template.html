@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+    <h1>Mlb Updates for {{ view.date }}</h1>
+    <h2>Summary</h2>
+    <span>There are {{view.num_games}} games today, {{view.num_actionable}} of them are bettable</span><br/>
+    {% if view.last %}
+        <span>Previously, betting netted <span style="color: {{ 'red' if view.last.net < 0 else 'green' }}">${{view.last.net}}</span></span><br/>
+    {% endif %}
+    {% if view.week_net != 0 %}
+        <span>Over the past week ({{view.week_count}} games), betting netted <span style="color: {{ 'red' if view.week_net < 0 else 'green' }}">${{view.week_net}}</span></span><br/>
+    {% endif %}
+    {% if view.extended_net != 0 %}
+        <span>Over the past 100 days ({{view.extended_count}} games), betting netted <span style="color: {{ 'red' if view.extended_net < 0 else 'green' }}">${{view.extended_net}}</span></span><br/>
+    {% endif %}
+
+    <h2>Todays Predictions</h2>
+    <table style="width: 100%">
+        {% for game in view.current %}
+            <tr style="padding-bottom: 10px;"><td style="background-color: {{ 'lightgrey' if loop.index % 2 == 0 else 'white' }}; opacity: 50%">
+            <h4>{{ game.summary }}</h4>
+            <span style="color: navy">{{game.action.description }}</span><br/><br/>
+            <table>
+                <tr>
+                    <table>
+                    <tr><td><b>Home</b></td><td><span>{{game.home_team.full}}</span></td></tr>
+                    {% if game.home_odds %}
+                    <tr><td><b>Home Line</b></td><td><span>{{game.home_odds.money_line}} (implied {{game.home_odds.minimum_confidence}}% confidence)</span></td></tr>
+                    {% endif %}
+                    {% if game.prediction != 0 %}
+                    <tr><td><b>Home Prediction</b></td><td><span>{{game.prediction.home_wins}}% win confidence</span></td></tr>
+                    {% endif %}
+                    <tr><td><b>Away</b></td><td><span>{{game.away_team.full}}</span></td></tr>
+                    {% if game.away_odds %}
+                    <tr><td><b>Away Line</b></td><td><span>{{game.away_odds.money_line}} (implied {{game.away_odds.minimum_confidence}}% confidence)</span></td></tr>
+                    {% endif %}
+                    {% if game.prediction != 0 %}
+                    <tr><td><b>Away Prediction</b></td><td><span>{{game.prediction.away_wins}}% win confidence</span></td></tr>
+                    {% endif %}
+                    </table>
+                    <ul>
+                        {% for err in game.errors %}
+                        <li>{{err}}</li>
+                        {% endfor %}
+                    </ul>
+                </tr>
+            </td>
+            </tr>
+        {% else %}
+            <span>No Games Today (Or something went wrong)</span>
+        {% endfor %}
+    </table>
+
+    <h2>Previous Results in Detail</h2>
+    <table style="width: 100%">
+        {% for game in view.previous %}
+        <tr style="padding-bottom: 10px;"><td style="background-color: {{ 'lightgreen' if game.result.correct > 0 else ('lightcoral' if game.result.wrong > 0 else 'lightgoldenrodyellow') }}; opacity: 80%">
+            <h4>{{ game.summary }}</h4>
+            <span style="color: navy">{{game.action.description }}</span><br/><br/>
+            <table>
+                <tr>
+                    <table>
+                    <tr><td><b>Home</b></td><td><span>{{game.home_team.full}}</span></td></tr>
+                    {% if game.home_odds %}
+                    <tr><td><b>Home Line</b></td><td><span>{{game.home_odds.money_line}} (implied {{game.home_odds.minimum_confidence}}% confidence)</span></td></tr>
+                    {% endif %}
+                    {% if game.prediction != 0 %}
+                    <tr><td><b>Home Prediction</b></td><td><span>{{game.prediction.home_wins}}% win confidence</span></td></tr>
+                    {% endif %}
+                    <tr><td><b>Away</b></td><td><span>{{game.away_team.full}}</span></td></tr>
+                    {% if game.away_odds %}
+                    <tr><td><b>Away Line</b></td><td><span>{{game.away_odds.money_line}} (implied {{game.away_odds.minimum_confidence}}% confidence)</span></td></tr>
+                    {% endif %}
+                    {% if game.prediction != 0 %}
+                    <tr><td><b>Away Prediction</b></td><td><span>{{game.prediction.away_wins}}% win confidence</span></td></tr>
+                    {% endif %}
+                    {% if game.result.home_score > 0 or game.result.away_score > 0 %}
+                    <tr><td><b>Game Result</b></td><td><span>Home: {{game.result.home_score}}, Away: {{game.result.away_score}}</span></td></tr>
+                    
+                    {% endif %}
+                    <tr><td><b>Game Outcome</b></td><td><span style="color: {{ 'red' if game.result.net < 0 else 'green' }}">${{game.result.net}}</span></td></tr>
+                    </table>
+                    <ul>
+                        {% for err in game.errors %}
+                        <li>{{err}}</li>
+                        {% endfor %}
+                    </ul>
+                </tr>
+                <tr>
+
+                </tr>
+        </td></tr>
+        {% else %}
+        <span>No Previous Games Found (Or something went wrong)</span>
+        {% endfor %}
+    </table>
+
+</body>
+</html>
